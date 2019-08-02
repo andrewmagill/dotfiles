@@ -7,3 +7,6 @@ alias r='reset'
 
 # git aliases
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+
+# HUBzero aliases
+alias hub='. ~/.bin/hub'
