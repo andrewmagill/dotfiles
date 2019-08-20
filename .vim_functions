@@ -13,7 +13,7 @@ endfunction
 au BufWritePre * :call <SID>RemoveTrailingWhitespaces()
 
 "***********************
-"Toggle tabs / spaces F11
+"Toggle tabs / spaces F12
 "***********************
 function! TabToggle()
   if &expandtab
@@ -26,5 +26,4 @@ function! TabToggle()
     set expandtab
   endif
 endfunction
-nmap <F11> mz:execute TabToggle()<CR>'z
-
+nmap <F12> mz:execute TabToggle()<CR>'z
