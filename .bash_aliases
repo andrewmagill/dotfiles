@@ -7,14 +7,13 @@ alias mv='mv -i'
 alias o='xdg-open'
 alias r='reset'
 
+# docker aliases
+alias docker='sudo docker'
+
 # git aliases
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 
-# python aliases
-alias pyserve='python -m SimpleHTTPServer'
-
 # tmux aliases
-alias tmuxi='tmuxinator'
 alias tko='tmux kill-session -t'
 
 # HUBzero aliases
