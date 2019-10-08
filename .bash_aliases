@@ -9,6 +9,7 @@ alias r='reset'
 
 # docker aliases
 alias docker='sudo docker'
+alias docker-compose='sudo docker-compose'
 
 # git aliases
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
