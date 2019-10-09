@@ -32,12 +32,6 @@ filetype plugin indent on    " required
 "
 " see :h vundle for more details
 
-" ***********************
-"NERDTree mappings
-" ***********************
-map <F9> :NERDTreeFind<CR>
-map <F10> :NERDTreeToggle<CR>
-
 "***********************
 "Airline settings
 "***********************
@@ -49,9 +43,3 @@ let g:airline_symbols.space = "\ua0"
 let g:airline_theme='solarized'
 set t_Co=256
 set laststatus=2
-
-"***********************
-"Enable neocomplete
-"***********************
-let g:neocomplete#enable_at_startup = 1
-
