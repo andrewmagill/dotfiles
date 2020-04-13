@@ -11,20 +11,3 @@ function! s:RemoveTrailingWhitespaces()
   call cursor(l,c)
 endfunction
 au BufWritePre * :call <SID>RemoveTrailingWhitespaces()
-
-"***********************
-"Toggle tabs / spaces F11
-"***********************
-function! TabToggle()
-  if &expandtab
-    set shiftwidth=4
-    set softtabstop=4
-    set noexpandtab
-  else
-    set shiftwidth=2
-    set softtabstop=2
-    set expandtab
-  endif
-endfunction
-nmap <F11> mz:execute TabToggle()<CR>'z
-
