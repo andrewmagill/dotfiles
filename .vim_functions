@@ -11,3 +11,14 @@ function! s:RemoveTrailingWhitespaces()
   call cursor(l,c)
 endfunction
 au BufWritePre * :call <SID>RemoveTrailingWhitespaces()
+
+"***********************
+"Show spaces
+"***********************
+function! ShowSpaces()
+  set listchars=space:·
+  highlight WhiteSpaceBol guifg=blue
+  highlight WhiteSpaceMol guifg=white
+  match WhiteSpaceMol / /
+endfunction
+nmap <F12> mz:execute ShowSpaces()<CR>'z
