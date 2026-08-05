@@ -1,0 +1,11 @@
+# Debian/Ubuntu packages (used by the WSL2 box) — one per line.
+# Installed with: sudo apt-get install -y $(grep -vE '^\s*(#|$)' packages/apt.txt)
+# Note: on Debian/Ubuntu, `fd` is the `fd-find` package (binary: fdfind).
+zsh
+neovim
+git
+stow
+ripgrep
+fd-find
+fzf
+curl

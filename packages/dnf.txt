@@ -1,0 +1,11 @@
+# Rocky Linux packages (desktop) — one per line.
+# Some packages (e.g. ripgrep, fd-find) require EPEL; bootstrap.sh enables it.
+# Installed with: sudo dnf install -y $(grep -vE '^\s*(#|$)' packages/dnf.txt)
+zsh
+neovim
+git
+stow
+ripgrep
+fd-find
+fzf
+curl

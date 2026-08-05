@@ -1,0 +1,9 @@
+# macOS packages — installed with: brew bundle --file=packages/Brewfile
+brew "zsh"
+brew "neovim"
+brew "git"
+brew "stow"
+brew "ripgrep"
+brew "fd"
+brew "fzf"
+brew "curl"
