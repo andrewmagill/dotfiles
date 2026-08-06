@@ -10,5 +10,6 @@ ripgrep
 fd-find
 fzf
 curl
-# gcc: C compiler — needed to build nvim-treesitter parsers
+# gcc + make: compile nvim-treesitter parsers and telescope-fzf-native
 gcc
+make
