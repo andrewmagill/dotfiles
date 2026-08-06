@@ -47,6 +47,11 @@ install_macos_packages() {
 # isn't reliably packaged in apt/dnf).
 install_starship() {
   command -v starship >/dev/null 2>&1 && return
+  # Also check the install path explicitly: bootstrap runs under bash and does
+  # NOT source ~/.zshenv, so ~/.local/bin may be absent from PATH on a re-run.
+  # Without this check a second run would needlessly re-download starship even
+  # though it's already installed.
+  [[ -x "$HOME/.local/bin/starship" ]] && return
   [[ "$(uname -s)" == "Darwin" ]] && return   # provided by the Brewfile
   log "Installing starship to ~/.local/bin"
   mkdir -p "$HOME/.local/bin"
@@ -65,8 +70,13 @@ stow_layers() {
     log "stow not installed; skipping linking (install it and re-run)"
     return
   fi
-  log "Stowing layers: $*"
-  stow --verbose --target "$HOME" "$@"
+  # --restow (-R) = unstow, then stow again. Plain `stow` only ADDS links; it
+  # won't remove a symlink whose source file you later deleted from a layer.
+  # Restowing reconciles $HOME to the layer's *current* contents, so re-runs
+  # converge on the exact desired state (idempotent toward deletions, not just
+  # additions). On a first run there's nothing to unstow, so it just links.
+  log "Restowing layers: $*"
+  stow --restow --verbose --target "$HOME" "$@"
 }
 
 case "$(uname -s)" in
