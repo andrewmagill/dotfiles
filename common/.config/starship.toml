@@ -1,0 +1,36 @@
+# Starship prompt — https://starship.rs/config/
+# Edits take effect in the next shell. Explore presets with:
+#   starship preset --list
+#   starship preset plain-text-symbols -o ~/.config/starship.toml   # no glyphs
+#
+# The symbols below use Nerd Font glyphs. If a box lacks the font, swap them for
+# plain text (e.g. git_branch symbol = "git:") or run the plain-text preset.
+
+add_newline = true
+
+format = """
+$directory\
+$git_branch$git_status\
+$dotnet$nodejs\
+$aws$azure\
+$character"""
+
+[character]
+success_symbol = "[❯](green)"
+error_symbol = "[❯](red)"
+
+[directory]
+truncation_length = 3
+truncate_to_repo = true
+
+[git_branch]
+symbol = " "          # Nerd Font branch glyph; use "git:" for plain text
+
+# Language/context modules are shown only in relevant directories by default.
+# Uncomment to tweak; see the Starship docs for each module's options.
+# [dotnet]
+# symbol = ".NET "
+# [nodejs]
+# symbol = " "
+# [aws]
+# format = '[$symbol($profile )]($style)'

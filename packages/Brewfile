@@ -7,3 +7,7 @@ brew "ripgrep"
 brew "fd"
 brew "fzf"
 brew "curl"
+brew "starship"
+
+# Nerd Font (adds glyphs for the prompt). Select it in your terminal afterward.
+cask "font-jetbrains-mono-nerd-font"

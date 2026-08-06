@@ -1,0 +1,17 @@
+# Files Stow should NOT symlink from this package.
+# NOTE: providing this file REPLACES Stow's built-in default ignore list, so the
+# useful defaults are re-listed here alongside our own additions.
+
+# Git internals & placeholders
+\.git
+\.gitignore
+\.gitkeep
+
+# Editor cruft
+.+~
+\#.*\#
+
+# Repo docs (anchored to the package root)
+^/README.*
+^/LICENSE.*
+^/COPYING

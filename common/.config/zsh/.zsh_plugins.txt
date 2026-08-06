@@ -1,0 +1,6 @@
+# antidote plugin list — one GitHub repo per line.
+# Order matters: completions first (so compinit sees them), syntax-highlighting
+# LAST (it must be sourced after other zle widgets).
+zsh-users/zsh-completions
+zsh-users/zsh-autosuggestions
+zsh-users/zsh-syntax-highlighting

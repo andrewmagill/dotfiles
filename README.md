@@ -137,6 +137,34 @@ The numeric prefixes set load order without any plugin framework.
 > (It is *not* short for "daemon" — that's the trailing `d` in program names like
 > `sshd`.)
 
+### Zsh concepts used here
+
+A few zsh-specific mechanisms appear throughout the config:
+
+- **`$fpath`** — zsh's *function* search path (the analog of `$PATH` for
+  executables). Autoloadable functions and completion definitions are found here;
+  the `zsh-completions` plugin simply prepends to it.
+- **`autoload -Uz name`** — lazily load a function from `$fpath` on first use.
+  `-U` suppresses alias expansion in its body, `-z` forces zsh-style — the safe,
+  standard flags. Used for `compinit`.
+- **`compinit`** — initializes the completion system by scanning `$fpath`, and
+  caches an index under `$XDG_CACHE_HOME`. It must run *after* anything that
+  extends `$fpath`, which is why `.zshrc` loads antidote before
+  `conf.d/30-completion.zsh`.
+- **`zle` / widgets** — the Zsh Line Editor and its key-bound commands.
+  `bindkey -e` selects emacs-style widgets; `zsh-syntax-highlighting` hooks zle
+  and so must load last.
+- **`setopt`** — toggles named shell options (`AUTO_CD`, `SHARE_HISTORY`, …).
+- **`zstyle`** — zsh's hierarchical config database, used to tune completion
+  (e.g. `zstyle ':completion:*' menu select`).
+- **Glob qualifiers / flags** — `*.zsh(N)` expands to nothing if there's no match
+  (nullglob); `${(s.:.)VAR}` splits a value on `:`; `${(P)var}` is indirect
+  (value-as-name).
+- **Parameter modifiers** — `${file:h}` is the directory part (like `dirname`),
+  `:t` the basename, `:r` strips the extension.
+- **`typeset -U path PATH`** — keeps `$PATH` unique; zsh ties the `$path` array to
+  the `$PATH` string, so you can edit either.
+
 ## Secrets
 
 This repo is public, so **nothing secret ever lives in it**. Two mechanisms:
