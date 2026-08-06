@@ -27,7 +27,8 @@ return {
           },
         },
       },
-      -- ts_ls = {},  -- TypeScript: added in the language-tooling step (needs Node.js).
+      ts_ls = {},   -- TypeScript/JavaScript (typescript-language-server via Node)
+      eslint = {},  -- lint diagnostics + fixes (uses the project's eslint config)
     }
 
     -- Ensure the servers are installed (lua_ls ships as a prebuilt binary, so no

@@ -85,6 +85,16 @@ install_neovim() {
   ln -sf "$NVIM_PREFIX/bin/nvim" "$HOME/.local/bin/nvim"
 }
 
+# mise: polyglot runtime version manager (node, python, terraform, …). Installed
+# user-space to ~/.local/bin; macOS gets it from the Brewfile instead.
+install_mise() {
+  command -v mise >/dev/null 2>&1 && return
+  [[ -x "$HOME/.local/bin/mise" ]] && return
+  [[ "$(uname -s)" == "Darwin" ]] && return   # provided by the Brewfile
+  log "Installing mise to ~/.local/bin"
+  curl -fsSL https://mise.run | sh
+}
+
 # antidote: cloned to XDG_DATA_HOME on every OS for a uniform path.
 install_antidote() {
   [[ -d "$ANTIDOTE_DIR" ]] && return
@@ -117,6 +127,7 @@ case "$(uname -s)" in
     install_neovim
     install_starship
     install_antidote
+    install_mise
     if is_wsl; then
       stow_layers common linux wsl
     else
@@ -127,6 +138,14 @@ case "$(uname -s)" in
     log "Unsupported OS: $(uname -s)"; exit 1
     ;;
 esac
+
+# Install language runtimes declared in the (now-stowed) mise global config.
+mise_bin="$(command -v mise 2>/dev/null || true)"
+[[ -z "${mise_bin:-}" && -x "$HOME/.local/bin/mise" ]] && mise_bin="$HOME/.local/bin/mise"
+if [[ -n "${mise_bin:-}" ]]; then
+  log "Installing language runtimes via mise (node, …)"
+  "$mise_bin" install || true
+fi
 
 # Nudge to make zsh the login shell (skipped if already zsh). May prompt for a
 # password, and can be restricted on locked-down machines — safe to ignore.

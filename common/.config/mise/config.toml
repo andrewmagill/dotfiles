@@ -1,0 +1,5 @@
+# mise global tool versions (https://mise.jdx.dev). Per-project .mise.toml files
+# override these. Run `mise install` to fetch them, or the shell hook installs on
+# demand. Add more languages here over time (python, terraform, go, …).
+[tools]
+node = "lts"
