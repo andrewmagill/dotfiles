@@ -1,4 +1,4 @@
-# --- Secrets: never commit anything secret-shaped -------------------------
+# --- Secrets --------------------------------------------------------------
 # Machine-local overrides and anything holding credentials live outside the
 # repo; these patterns are a backstop in case one lands inside it by mistake.
 *.local
@@ -9,9 +9,12 @@ secrets.zsh
 .env
 .env.*
 
-# --- OS / editor noise ----------------------------------------------------
+# --- OS / editor ----------------------------------------------------------
 .DS_Store
 .AppleDouble
 *.swp
 *.swo
 *~
+
+# --- Other ----------------------------------------------------------------
+notes/

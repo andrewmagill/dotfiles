@@ -2,24 +2,22 @@
 
 Personal, cross-platform dotfiles managed with **[GNU Stow](https://www.gnu.org/software/stow/)**
 and organized around the **[XDG Base Directory](https://specifications.freedesktop.org/basedir-spec/latest/)**
-specification. One repository drives three environments:
+specification. One repository for three environments:
 
-- 🐧 **Rocky Linux** — desktop
-- 🍎 **macOS** (Apple Silicon) — laptop
-- 🪟 **Ubuntu on WSL2** — Windows work machine
+- **Rocky Linux** — desktop
+- **macOS** (Apple Silicon) — laptop
+- **Ubuntu on WSL2** — Windows work machine
 
-## Philosophy
+## Goals
 
-- **Simple and transparent.** Real files, symlinked into place by Stow — no
-  framework, no magic, everything is greppable and inspectable.
-- **One repo, per-OS layers.** Shared config lives in `common/`; OS-specific
-  bits live in `linux/`, `macos/`, and `wsl/`. You link the layers your machine
-  needs.
+- **Simple and transparent.** Files symlinked into place by Stow — no
+  framework, everything is easily greppable and inspectable.
+- **One repo, per-OS layers.** Shared config in `common/`; OS-specific in `linux/`, 
+  `macos/`, and `wsl/`. You link the layers your machine needs.
 - **XDG-clean `$HOME`.** Config under `~/.config`, data under `~/.local/share`,
-  state under `~/.local/state`, cache under `~/.cache`. `$HOME` stays tidy.
-- **No secrets in the repo.** This repository is **public**. Anything secret or
-  machine-specific lives in untracked local files that never get committed
-  (see [Secrets](#secrets)).
+  state under `~/.local/state`, cache under `~/.cache`.
+- **No secrets in the repo.** Anything secret or machine-specific lives in 
+  untracked local files that never get committed (see [Secrets](#secrets)).
 - **Reproducible bootstrap.** One script installs packages and links configs on
   a fresh machine.
 
@@ -35,8 +33,7 @@ dotfiles/
 ├── common/               # Stow layer: config shared by every machine
 ├── linux/                # Stow layer: all Linux (Rocky desktop + WSL)
 ├── macos/                # Stow layer: macOS only
-├── wsl/                  # Stow layer: WSL-only extras
-└── notes/                # reference notes (not stowed)
+└── wsl/                  # Stow layer: WSL-only extras
 ```
 
 Each Stow *layer* mirrors the structure of `$HOME`. For example,
@@ -62,21 +59,16 @@ To link by hand instead:
 | macOS                | `stow -t ~ common macos`         |
 | Ubuntu on WSL2       | `stow -t ~ common linux wsl`     |
 
-## How it's organized
+## Organization
 
 ### Stow layers
 
-Stow "packages" (here called *layers*) are just directories whose contents get
-symlinked into `$HOME`. Splitting by OS keeps each file free of the platform it
-doesn't apply to — a macOS-only `karabiner` config never appears on Linux, and a
-Linux-only `systemd` unit never appears on the Mac. Small per-OS differences
-*inside* a shared file (e.g. `open` vs `xdg-open`) are handled with a `case`
-statement rather than a whole separate file.
+Stow "packages" (aka *layers*) are directories whose contents get symlinked into `$HOME`,
+package specific configs are symlinked only in their target environments.
 
 ### Package lists
 
-Installation is separate from linking. Each package manager has its own list so
-"what should be installed" is itself version-controlled:
+Installation is separate from linking. Each package manager has its own list:
 
 - **macOS** → `packages/Brewfile` (`brew bundle`)
 - **Ubuntu/Debian (WSL)** → `packages/apt.txt`
@@ -167,8 +159,3 @@ This repo is public, so **nothing secret ever lives in it**. Two mechanisms:
 - [ ] Thin Windows-native layer (Windows Terminal, PowerShell)
 - [ ] Nix / Home Manager (future, for fully reproducible packages)
 - [ ] Tiling Wayland compositor (Sway / Hyprland) — someday
-
-## Notes
-
-Background reference material lives in [`notes/`](notes/) — e.g. the Linux
-login/boot flow, PAM, X11 vs Wayland, and the `.d` naming convention.
