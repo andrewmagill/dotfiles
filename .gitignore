@@ -18,3 +18,6 @@ secrets.zsh
 
 # --- Other ----------------------------------------------------------------
 notes/
+
+# Generated antidote plugin bundle (built from .zsh_plugins.txt at shell start)
+.zsh_plugins.zsh
