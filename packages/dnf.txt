@@ -2,7 +2,8 @@
 # Some packages (e.g. ripgrep, fd-find) require EPEL; bootstrap.sh enables it.
 # Installed with: sudo dnf install -y $(grep -vE '^\s*(#|$)' packages/dnf.txt)
 zsh
-neovim
+# neovim is installed from the official prebuilt release by bootstrap.sh
+# (distro packages are too old for a modern LSP config) — see install_neovim().
 git
 stow
 ripgrep

@@ -2,7 +2,8 @@
 # Installed with: sudo apt-get install -y $(grep -vE '^\s*(#|$)' packages/apt.txt)
 # Note: on Debian/Ubuntu, `fd` is the `fd-find` package (binary: fdfind).
 zsh
-neovim
+# neovim is installed from the official prebuilt release by bootstrap.sh
+# (distro packages are too old for a modern LSP config) — see install_neovim().
 git
 stow
 ripgrep
