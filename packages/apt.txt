@@ -9,3 +9,5 @@ ripgrep
 fd-find
 fzf
 curl
+# gcc: C compiler — needed to build nvim-treesitter parsers
+gcc
