@@ -3,6 +3,7 @@
 # repo; these patterns are a backstop in case one lands inside it by mistake.
 *.local
 *.local.zsh
+*.local.conf
 *.secrets.zsh
 secrets.zsh
 *.env
@@ -21,3 +22,11 @@ notes/
 
 # Generated antidote plugin bundle (built from .zsh_plugins.txt at shell start)
 .zsh_plugins.zsh
+
+# zsh runtime artifacts — these are XDG-relocated out of the repo (history →
+# state, zcompdump/zcompcache → cache), so this is a backstop in case one ever
+# lands in the stowed ~/.config/zsh.
+.zcompdump*
+.zcompcache
+.zsh_history
+.zsh_sessions/

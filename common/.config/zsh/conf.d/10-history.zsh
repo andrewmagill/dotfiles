@@ -1,5 +1,11 @@
-# History. HISTFILE itself is set in .zshenv (it's environment); the behavior
-# below is interactive-only.
+# History. HISTFILE is (re)set HERE, not only in .zshenv: the system /etc/zshrc
+# on macOS and Debian/Ubuntu runs AFTER .zshenv and overrides HISTFILE to
+# $ZDOTDIR/.zsh_history (= the stowed repo). This interactive fragment loads
+# after /etc/zshrc, so re-asserting the XDG path here wins and keeps history out
+# of the repo.
+export HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
+[[ -d "${HISTFILE:h}" ]] || mkdir -p "${HISTFILE:h}"
+
 HISTSIZE=50000               # lines kept in memory
 SAVEHIST=50000               # lines written to $HISTFILE
 

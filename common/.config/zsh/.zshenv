@@ -14,9 +14,14 @@ export VISUAL="nvim"
 export PAGER="less"
 
 # --- Relocate non-XDG-aware tools out of $HOME -----------------------------
+# HISTFILE is ALSO re-asserted in conf.d/10-history.zsh, because the system
+# /etc/zshrc (macOS, Debian/Ubuntu) overrides it after this file runs.
 export HISTFILE="$XDG_STATE_HOME/zsh/history"
 export LESSHISTFILE="$XDG_STATE_HOME/less/history"
 [[ -d "$XDG_STATE_HOME/zsh" ]] || mkdir -p "$XDG_STATE_HOME/zsh"
+# macOS Terminal saves shell sessions into $ZDOTDIR/.zsh_sessions (= the stowed
+# repo). Disable it — harmless no-op on Linux.
+export SHELL_SESSIONS_DISABLE=1
 
 # --- PATH ------------------------------------------------------------------
 typeset -U path PATH                        # keep PATH entries unique
