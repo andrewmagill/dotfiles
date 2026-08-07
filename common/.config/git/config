@@ -1,0 +1,17 @@
+# Git configuration (XDG location: ~/.config/git/config).
+# Machine-specific identity (user.name / user.email) lives in the global
+# ~/.gitconfig, which git merges with this file — so this stays shareable and
+# secret-free.
+
+[core]
+	pager = delta
+
+[interactive]
+	diffFilter = delta --color-only
+
+[delta]
+	navigate = true        # use n / N to jump between diff sections
+	line-numbers = true
+
+[merge]
+	conflictStyle = zdiff3

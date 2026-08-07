@@ -8,8 +8,13 @@ git
 stow
 ripgrep
 fd-find
+# bat (binary: batcat on Debian/Ubuntu) + git-delta (binary: delta): highlighters
+bat
+git-delta
 fzf
 curl
+# unzip: extract downloaded Nerd Font archives (bootstrap's install_fonts)
+unzip
 # gcc + make: compile nvim-treesitter parsers and telescope-fzf-native
 gcc
 make

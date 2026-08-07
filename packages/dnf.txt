@@ -2,14 +2,20 @@
 # Some packages (e.g. ripgrep, fd-find) require EPEL; bootstrap.sh enables it.
 # Installed with: sudo dnf install -y $(grep -vE '^\s*(#|$)' packages/dnf.txt)
 zsh
+# kitty: terminal emulator (Linux desktop)
+kitty
 # neovim is installed from the official prebuilt release by bootstrap.sh
 # (distro packages are too old for a modern LSP config) — see install_neovim().
 git
 stow
 ripgrep
 fd-find
+# bat: syntax-highlighting pager (git-delta isn't in EPEL; bootstrap installs it)
+bat
 fzf
 curl
+# unzip: extract downloaded Nerd Font archives (bootstrap's install_fonts)
+unzip
 # gcc + make: compile nvim-treesitter parsers and telescope-fzf-native
 gcc
 make

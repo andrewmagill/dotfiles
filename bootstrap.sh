@@ -17,6 +17,8 @@ ANTIDOTE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/antidote"
 # errors). Revisit when migrating to the nvim-treesitter main branch.
 NVIM_VERSION="v0.11.7"
 NVIM_PREFIX="$HOME/.local/nvim"   # user-space install prefix (no sudo needed)
+FONTS_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/fonts"
+DELTA_VERSION="0.19.2"            # git-delta: not packaged for Rocky/EPEL
 
 log() { printf '\033[1;34m==>\033[0m %s\n' "$*"; }
 
@@ -98,6 +100,52 @@ install_mise() {
   curl -fsSL https://mise.run | sh
 }
 
+# Nerd Font for terminal glyphs. macOS installs it via the Brewfile cask; on WSL
+# the terminal (and its fonts) live on Windows; so this applies only to a Linux
+# desktop. User-space install into XDG fonts dir.
+install_fonts() {
+  command -v fc-cache >/dev/null 2>&1 || { log "fontconfig missing; skipping font install"; return; }
+  fc-list 2>/dev/null | grep -qi 'opendyslexic' && return   # already installed
+  log "Installing OpenDyslexic Nerd Font to $FONTS_DIR"
+  local tmp; tmp="$(mktemp -d)"
+  if curl -fsSL -o "$tmp/OpenDyslexic.zip" \
+      "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/OpenDyslexic.zip"; then
+    mkdir -p "$FONTS_DIR/OpenDyslexic"
+    unzip -oq "$tmp/OpenDyslexic.zip" -d "$FONTS_DIR/OpenDyslexic"
+    fc-cache -f "$FONTS_DIR" >/dev/null 2>&1
+  else
+    log "Font download failed; skipping"
+  fi
+  rm -rf "$tmp"
+}
+
+# git-delta: syntax-highlighting pager for git diffs. Debian/Ubuntu install it
+# via apt and macOS via the Brewfile; it isn't packaged for Rocky/EPEL, so there
+# we drop a pinned prebuilt binary into ~/.local/bin.
+install_delta() {
+  command -v delta >/dev/null 2>&1 && return
+  [[ -x "$HOME/.local/bin/delta" ]] && return
+  [[ "$(uname -s)" == "Darwin" ]] && return   # Brewfile provides it
+  local arch
+  case "$(uname -m)" in
+    x86_64)        arch="x86_64-unknown-linux-gnu" ;;
+    aarch64|arm64) arch="aarch64-unknown-linux-gnu" ;;
+    *) log "Unknown arch $(uname -m); skipping delta"; return ;;
+  esac
+  local pkg="delta-${DELTA_VERSION}-${arch}"
+  log "Installing git-delta ${DELTA_VERSION} to ~/.local/bin"
+  local tmp; tmp="$(mktemp -d)"
+  if curl -fsSL -o "$tmp/delta.tar.gz" \
+      "https://github.com/dandavison/delta/releases/download/${DELTA_VERSION}/${pkg}.tar.gz"; then
+    tar -xzf "$tmp/delta.tar.gz" -C "$tmp"
+    mkdir -p "$HOME/.local/bin"
+    install -m 0755 "$tmp/$pkg/delta" "$HOME/.local/bin/delta"
+  else
+    log "delta download failed; skipping"
+  fi
+  rm -rf "$tmp"
+}
+
 # antidote: cloned to XDG_DATA_HOME on every OS for a uniform path.
 install_antidote() {
   [[ -d "$ANTIDOTE_DIR" ]] && return
@@ -131,9 +179,11 @@ case "$(uname -s)" in
     install_starship
     install_antidote
     install_mise
+    install_delta
     if is_wsl; then
       stow_layers common linux wsl
     else
+      install_fonts               # Linux desktop only (WSL fonts live on Windows)
       stow_layers common linux
     fi
     ;;

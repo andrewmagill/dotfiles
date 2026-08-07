@@ -4,6 +4,11 @@
 local wezterm = require("wezterm")
 
 return {
+  -- Match the Alacritty/Windows Terminal font. The font must be installed on
+  -- the OS running WezTerm (Nerd Font, for the prompt glyphs).
+  font = wezterm.font("OpenDyslexicM Nerd Font Mono"),
+  font_size = 13.0,
+
   color_scheme = "SeaShells (custom)",
   color_schemes = {
     ["SeaShells (custom)"] = {

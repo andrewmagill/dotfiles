@@ -5,10 +5,16 @@ brew "git"
 brew "stow"
 brew "ripgrep"
 brew "fd"
+brew "bat"
+brew "git-delta"
 brew "fzf"
 brew "curl"
 brew "starship"
 brew "mise"
 
+# Terminal emulator (uses the config in common/.config/kitty/)
+cask "kitty"
+
 # Nerd Font (adds glyphs for the prompt). Select it in your terminal afterward.
-cask "font-jetbrains-mono-nerd-font"
+# OpenDyslexicM Nerd Font Mono — matches Alacritty / WezTerm / Windows Terminal.
+cask "font-opendyslexic-nerd-font"
