@@ -1,0 +1,91 @@
+# Docs: https://alacritty.org/config-alacritty.html
+
+import = []
+
+[env]
+TERM = "xterm-256color"
+
+[window]
+decorations = "Buttonless"
+
+[window.position]
+x = 1512
+y = 0
+
+[window.dimensions]
+columns = 87
+lines = 42
+
+[window.padding]
+x = 6
+y = 6
+
+[scrolling]
+multiplier = 1
+
+[font]
+size = 13
+
+# normal = { family = "AverageMono", style = "Regular" }
+
+# normal = { family = "IBM 3270", style = "Regular" }
+# normal = { family = "Cutive Mono", style = "Regular" }
+# normal = { family = "CommitMono", style = "Regular" }
+
+# normal = { family = "Hasklig", style = "Medium" }
+
+# normal = { family = "Roboto Mono", style = "Regular" }
+# normal = { family = "BlexMono Nerd Font", style = "Regular" }
+
+# [font.normal]
+# family = "NotCourierSans"
+# style = "Regular"
+
+# normal = { family = "Noto Sans Mono", style = "Regular" }
+# normal = { family = "Inconsolata-g for Powerline", style = "g" }
+# normal = { family = "FreeMono", style = "Medium" }
+
+[font.normal]
+family = "OpenDyslexicM Nerd Font Mono"
+style = "Regular"
+
+[mouse]
+hide_when_typing = true
+
+[colors]
+draw_bold_text_with_bright_colors = true
+
+# Colors (SeaShells)
+# Source: https://github.com/mbadolato/iTerm2-Color-Schemes
+
+[colors.primary]
+background = '#09141b'
+foreground = '#deb88d'
+
+[colors.normal]
+black = '#17384c'
+blue = '#1e4950'
+cyan = '#50a3b5'
+green = '#027c9b'
+magenta = '#68d4f1'
+red = '#d15123'
+white = '#deb88d'
+yellow = '#fca02f'
+
+[colors.bright]
+black = '#434b53'
+blue = '#1bbcdd'
+cyan = '#87acb4'
+green = '#628d98'
+magenta = '#bbe3ee'
+red = '#d48678'
+white = '#fee4ce'
+yellow = '#fdd39f'
+
+[colors.cursor]
+cursor = '#fca02f'
+text = '#08131a'
+
+[colors.selection]
+background = '#1e4962'
+text = '#fee4ce'
