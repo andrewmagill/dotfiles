@@ -200,6 +200,10 @@ if [[ -n "${mise_bin:-}" ]]; then
   "$mise_bin" install || true
 fi
 
+# Build bat's theme cache so the tracked kanagawa theme is available.
+bat_bin="$(command -v bat 2>/dev/null || command -v batcat 2>/dev/null || true)"
+[[ -n "${bat_bin:-}" ]] && "$bat_bin" cache --build >/dev/null 2>&1
+
 # Nudge to make zsh the login shell (skipped if already zsh). May prompt for a
 # password, and can be restricted on locked-down machines — safe to ignore.
 if command -v zsh >/dev/null 2>&1 && [[ "${SHELL:-}" != *zsh ]]; then

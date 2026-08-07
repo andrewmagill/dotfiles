@@ -12,6 +12,7 @@
 [delta]
 	navigate = true        # use n / N to jump between diff sections
 	line-numbers = true
+	syntax-theme = kanagawa
 
 [merge]
 	conflictStyle = zdiff3

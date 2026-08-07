@@ -1,0 +1,5 @@
+# bat configuration.
+# Theme matches the Neovim colorscheme (menisadi/kanagawa.vim, Wave). The theme
+# file lives in themes/kanagawa.tmTheme; run `bat cache --build` after installing
+# it (bootstrap.sh does this automatically).
+--theme="kanagawa"
