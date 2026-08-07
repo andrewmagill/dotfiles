@@ -12,7 +12,10 @@ DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$DOTFILES"
 
 ANTIDOTE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/antidote"
-NVIM_VERSION="v0.12.4"            # pinned; distro Neovim packages lag too far behind
+# Pinned to 0.11.x on purpose: nvim-treesitter's (now-frozen) master branch is
+# incompatible with 0.12's treesitter core (breaks query directives → markdown
+# errors). Revisit when migrating to the nvim-treesitter main branch.
+NVIM_VERSION="v0.11.7"
 NVIM_PREFIX="$HOME/.local/nvim"   # user-space install prefix (no sudo needed)
 
 log() { printf '\033[1;34m==>\033[0m %s\n' "$*"; }

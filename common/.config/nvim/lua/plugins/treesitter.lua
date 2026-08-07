@@ -13,7 +13,8 @@ return {
     require("nvim-treesitter.configs").setup({
       ensure_installed = {
         "lua", "vim", "vimdoc", "bash", "python", "c",
-        "typescript", "tsx", "javascript", "json", "yaml", "markdown",
+        "typescript", "tsx", "javascript", "json", "yaml",
+        "markdown", "markdown_inline",  -- inline must accompany markdown (injection)
       },
       auto_install = true,        -- install a missing parser when you open a file
       highlight = { enable = true },
