@@ -7,6 +7,7 @@
 # plain text (e.g. git_branch symbol = "git:") or run the plain-text preset.
 
 add_newline = true
+palette = "seashells"
 
 format = """
 $directory\
@@ -15,16 +16,31 @@ $dotnet$nodejs\
 $aws$azure\
 $character"""
 
+# Palette ported from the Alacritty "SeaShells" scheme (common/.config/alacritty).
+[palettes.seashells]
+bg     = "#09141b"
+fg     = "#deb88d"
+red    = "#d15123"
+orange = "#fca02f"
+green  = "#027c9b"   # SeaShells "green" is a teal
+cyan   = "#50a3b5"
+blue   = "#68d4f1"
+sky    = "#1bbcdd"
+sand   = "#fee4ce"
+teal   = "#17384c"
+
 [character]
 success_symbol = "[❯](green)"
 error_symbol = "[❯](red)"
 
 [directory]
+style = "bold blue"
 truncation_length = 3
 truncate_to_repo = true
 
 [git_branch]
 symbol = " "          # Nerd Font branch glyph; use "git:" for plain text
+style = "bold orange"
 
 # Language/context modules are shown only in relevant directories by default.
 # Uncomment to tweak; see the Starship docs for each module's options.

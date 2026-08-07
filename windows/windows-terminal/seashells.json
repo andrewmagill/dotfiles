@@ -1,0 +1,26 @@
+{
+  "name": "SeaShells",
+
+  "background": "#09141B",
+  "foreground": "#DEB88D",
+  "cursorColor": "#FCA02F",
+  "selectionBackground": "#1E4962",
+
+  "black": "#17384C",
+  "red": "#D15123",
+  "green": "#027C9B",
+  "yellow": "#FCA02F",
+  "blue": "#1E4950",
+  "purple": "#68D4F1",
+  "cyan": "#50A3B5",
+  "white": "#DEB88D",
+
+  "brightBlack": "#434B53",
+  "brightRed": "#D48678",
+  "brightGreen": "#628D98",
+  "brightYellow": "#FDD39F",
+  "brightBlue": "#1BBCDD",
+  "brightPurple": "#BBE3EE",
+  "brightCyan": "#87ACB4",
+  "brightWhite": "#FEE4CE"
+}
