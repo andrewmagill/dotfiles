@@ -20,7 +20,8 @@ export LESSHISTFILE="$XDG_STATE_HOME/less/history"
 
 # --- PATH ------------------------------------------------------------------
 typeset -U path PATH                        # keep PATH entries unique
-[[ -d "$HOME/.local/bin" ]] && path=("$HOME/.local/bin" $path)
-# Homebrew on Apple Silicon (no-op elsewhere)
+# Homebrew on Apple Silicon first (no-op elsewhere), THEN prepend ~/.local/bin so
+# our pinned prebuilt tools (nvim, mise, delta, …) take precedence over brew.
 [[ -x /opt/homebrew/bin/brew ]] && eval "$(/opt/homebrew/bin/brew shellenv)"
+[[ -d "$HOME/.local/bin" ]] && path=("$HOME/.local/bin" $path)
 export PATH

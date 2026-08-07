@@ -3,9 +3,10 @@
 #
 #   ./bootstrap.sh
 #
-# Detects the OS (and, on Linux, the package manager and whether it's running
-# under WSL), installs packages from packages/, installs shell tooling
-# (starship, antidote), then stows the right layers into $HOME.
+# Detects the OS (and, on Linux, the package manager and whether it's under WSL),
+# installs packages from packages/, installs pinned prebuilt tools that aren't
+# packaged (Neovim, Starship, mise, git-delta) and the Nerd Font, then stows the
+# right layers into $HOME.
 set -euo pipefail
 
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -65,27 +66,37 @@ install_starship() {
   curl -sS https://starship.rs/install.sh | sh -s -- -y -b "$HOME/.local/bin"
 }
 
-# Neovim: install the official prebuilt release into ~/.local (user-space, no
-# sudo). Distro packages ship 0.10 or older — too old for a modern LSP config,
-# which needs 0.11+. macOS uses the up-to-date Homebrew build instead.
+# Neovim: install the pinned official prebuilt release into ~/.local (user-space,
+# no sudo) on BOTH Linux and macOS, so every machine runs the exact same version.
+# Distro packages are too old (0.10), and Homebrew floats to latest — but we pin
+# 0.11.x on purpose (nvim-treesitter master is incompatible with 0.12; see above).
 install_neovim() {
   if [[ "$("$NVIM_PREFIX/bin/nvim" --version 2>/dev/null | head -1)" == "NVIM ${NVIM_VERSION}" ]]; then
     return  # already at the pinned version
   fi
-  local arch
+  local os arch
+  case "$(uname -s)" in
+    Linux)  os="linux" ;;
+    Darwin) os="macos" ;;
+    *) log "Unsupported OS for Neovim install"; return ;;
+  esac
   case "$(uname -m)" in
     x86_64)        arch="x86_64" ;;
     aarch64|arm64) arch="arm64" ;;
     *) log "Unknown arch $(uname -m); skipping Neovim install"; return ;;
   esac
-  local tarball="nvim-linux-${arch}.tar.gz"
-  log "Installing Neovim ${NVIM_VERSION} (${arch}) to ${NVIM_PREFIX}"
+  local tarball="nvim-${os}-${arch}.tar.gz"
+  log "Installing Neovim ${NVIM_VERSION} (${os}-${arch}) to ${NVIM_PREFIX}"
   local tmp; tmp="$(mktemp -d)"
   curl -fsSL -o "$tmp/$tarball" \
     "https://github.com/neovim/neovim/releases/download/${NVIM_VERSION}/${tarball}"
   rm -rf "$NVIM_PREFIX"; mkdir -p "$NVIM_PREFIX"
   tar -xzf "$tmp/$tarball" -C "$NVIM_PREFIX" --strip-components=1
   rm -rf "$tmp"
+  if [[ "$os" == "macos" ]]; then
+    # Clear the Gatekeeper quarantine flag on the freshly-downloaded binary.
+    xattr -r -d com.apple.quarantine "$NVIM_PREFIX" 2>/dev/null || true
+  fi
   mkdir -p "$HOME/.local/bin"
   ln -sf "$NVIM_PREFIX/bin/nvim" "$HOME/.local/bin/nvim"
 }
@@ -170,6 +181,7 @@ stow_layers() {
 case "$(uname -s)" in
   Darwin)
     install_macos_packages
+    install_neovim
     install_antidote
     stow_layers common macos
     ;;

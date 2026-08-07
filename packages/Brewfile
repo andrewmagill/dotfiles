@@ -1,6 +1,7 @@
 # macOS packages — installed with: brew bundle --file=packages/Brewfile
 brew "zsh"
-brew "neovim"
+# neovim is installed from the pinned official prebuilt release by bootstrap.sh
+# (Homebrew floats to latest; we pin 0.11.x) — see install_neovim().
 brew "git"
 brew "stow"
 brew "ripgrep"
