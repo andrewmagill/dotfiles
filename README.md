@@ -48,8 +48,10 @@ cd ~/dotfiles
 ```
 
 `bootstrap.sh` detects the OS (and, on Linux, the package manager and whether
-it's running under WSL), installs the listed packages, then symlinks the right
-layers with Stow.
+it's running under WSL), installs the listed packages **plus pinned prebuilt
+tools** (Neovim, Starship, mise, git-delta) and the Nerd Font, then symlinks the
+right layers with Stow. It's re-runnable — each step is guarded, and Stow uses
+`--restow`.
 
 To link by hand instead:
 
@@ -58,6 +60,26 @@ To link by hand instead:
 | Rocky Linux desktop  | `stow -t ~ common linux`         |
 | macOS                | `stow -t ~ common macos`         |
 | Ubuntu on WSL2       | `stow -t ~ common linux wsl`     |
+
+## What's configured
+
+| Area | Tools | Highlights |
+| ---- | ----- | ---------- |
+| **Shell** | zsh, Starship, antidote | XDG-relocated `ZDOTDIR`, numbered `conf.d/` fragments, plugins (autosuggestions, syntax-highlighting, completions) |
+| **Editor** | Neovim (pinned **0.11.7**) | lazy.nvim; LSP via mason + lspconfig (lua_ls, TypeScript); blink.cmp completion; Treesitter; Telescope; kanagawa colorscheme |
+| **Runtimes** | mise | tool versions declared in `~/.config/mise/config.toml` (Node LTS today) |
+| **Terminals** | Alacritty, kitty, WezTerm, Windows Terminal | all themed with the **SeaShells** palette |
+| **Pager / diff** | bat, git-delta | syntax highlighting in `less`, `man`, and `git diff/show` — kanagawa theme matching Neovim |
+| **Font** | OpenDyslexic Nerd Font | installed per-OS, selected in each terminal |
+
+**How things get installed.** Packaged tools come from each OS's list under
+`packages/`. Tools that aren't reliably packaged — **Neovim, Starship, mise,
+git-delta** — are installed as **pinned prebuilt binaries** into `~/.local/bin`
+(user-space, no sudo), so every machine runs the same version.
+
+> **Why Neovim is pinned to 0.11.7:** nvim-treesitter's frozen `master` branch is
+> incompatible with Neovim 0.12's treesitter core (it breaks markdown
+> highlighting). We'll un-pin once we migrate to nvim-treesitter's `main` branch.
 
 ## Organization
 
@@ -180,10 +202,10 @@ This repo is public, so **nothing secret ever lives in it**. Two mechanisms:
 
 ## Roadmap
 
-- [ ] Zsh config files (`.zshenv` / `.zshrc` / `conf.d/`)
-- [ ] Language tooling: .NET/C#, Node/TypeScript, SQL (PostgreSQL + SQL Server)
-- [ ] Neovim configuration
+- [ ] More languages via mise + LSP: C# (.NET), Python, SQL (PostgreSQL / SQL Server), Terraform
+- [ ] Neovim: formatting (conform.nvim), git signs, statusline (lualine), a DAP debugger
+- [ ] Migrate nvim-treesitter to the `main` branch (would let us un-pin Neovim from 0.11)
 - [ ] Custom login flavor (motd / `profile.d`)
-- [ ] Thin Windows-native layer (Windows Terminal, PowerShell)
-- [ ] Nix / Home Manager (future, for fully reproducible packages)
+- [ ] Thin Windows-native layer (Windows Terminal, PowerShell profile)
+- [ ] Nix / Home Manager — declarative, fully-pinned reproducibility (the eventual endgame)
 - [ ] Tiling Wayland compositor (Sway / Hyprland) — someday
