@@ -16,6 +16,4 @@ brew "mise"
 # Terminal emulator (uses the config in common/.config/kitty/)
 cask "kitty"
 
-# Nerd Font (adds glyphs for the prompt). Select it in your terminal afterward.
-# OpenDyslexicM Nerd Font Mono — matches Alacritty / WezTerm / Windows Terminal.
-cask "font-opendyslexic-nerd-font"
+# Font: Sono is installed by bootstrap.sh (install_fonts) — it isn't on Homebrew.

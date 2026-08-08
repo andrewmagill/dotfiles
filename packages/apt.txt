@@ -13,7 +13,7 @@ bat
 git-delta
 fzf
 curl
-# unzip: extract downloaded Nerd Font archives (bootstrap's install_fonts)
+# unzip: general archive extraction utility
 unzip
 # gcc + make: compile nvim-treesitter parsers and telescope-fzf-native
 gcc

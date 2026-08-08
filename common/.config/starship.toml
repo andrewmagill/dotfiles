@@ -3,8 +3,8 @@
 #   starship preset --list
 #   starship preset plain-text-symbols -o ~/.config/starship.toml   # no glyphs
 #
-# The symbols below use Nerd Font glyphs. If a box lacks the font, swap them for
-# plain text (e.g. git_branch symbol = "git:") or run the plain-text preset.
+# Symbols are plain text (no Nerd Font glyphs) so they render in any font,
+# including Sono. The prompt char is › (U+203A), which Sono includes.
 
 add_newline = true
 palette = "seashells"
@@ -30,8 +30,8 @@ sand   = "#fee4ce"
 teal   = "#17384c"
 
 [character]
-success_symbol = "[❯](green)"
-error_symbol = "[❯](red)"
+success_symbol = "[›](green)"
+error_symbol = "[›](red)"
 
 [directory]
 style = "bold blue"
@@ -39,14 +39,25 @@ truncation_length = 3
 truncate_to_repo = true
 
 [git_branch]
-symbol = " "          # Nerd Font branch glyph; use "git:" for plain text
+symbol = ""           # icon-free; the bold orange color marks it as the branch
 style = "bold orange"
 
-# Language/context modules are shown only in relevant directories by default.
-# Uncomment to tweak; see the Starship docs for each module's options.
-# [dotnet]
-# symbol = ".NET "
-# [nodejs]
-# symbol = " "
-# [aws]
-# format = '[$symbol($profile )]($style)'
+# Sono lacks the arrow glyphs, so override git_status's default ⇡⇣⇕✘ with ASCII.
+[git_status]
+ahead    = ">"
+behind   = "<"
+diverged = "<>"
+deleted  = "x"
+
+# Language/context modules — plain-text symbols instead of Nerd Font glyphs.
+[dotnet]
+symbol = ".NET "
+
+[nodejs]
+symbol = "node "
+
+[aws]
+symbol = "aws "
+
+[azure]
+symbol = "az "

@@ -19,6 +19,7 @@ ANTIDOTE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/antidote"
 NVIM_VERSION="v0.11.7"
 NVIM_PREFIX="$HOME/.local/nvim"   # user-space install prefix (no sudo needed)
 FONTS_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/fonts"
+SONO_BASE="https://raw.githubusercontent.com/sursly/sono/master/fonts/ttf"
 DELTA_VERSION="0.19.2"            # git-delta: not packaged for Rocky/EPEL
 
 log() { printf '\033[1;34m==>\033[0m %s\n' "$*"; }
@@ -111,23 +112,27 @@ install_mise() {
   curl -fsSL https://mise.run | sh
 }
 
-# Nerd Font for terminal glyphs. macOS installs it via the Brewfile cask; on WSL
-# the terminal (and its fonts) live on Windows; so this applies only to a Linux
-# desktop. User-space install into XDG fonts dir.
+# Sono monospace font for the terminal. It isn't on Homebrew or in distro repos,
+# so fetch the static weights from the source repo. macOS installs into
+# ~/Library/Fonts; a Linux desktop into the XDG fonts dir. (WSL is skipped — its
+# terminal and fonts live on Windows.)
 install_fonts() {
-  command -v fc-cache >/dev/null 2>&1 || { log "fontconfig missing; skipping font install"; return; }
-  fc-list 2>/dev/null | grep -qi 'opendyslexic' && return   # already installed
-  log "Installing OpenDyslexic Nerd Font to $FONTS_DIR"
-  local tmp; tmp="$(mktemp -d)"
-  if curl -fsSL -o "$tmp/OpenDyslexic.zip" \
-      "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/OpenDyslexic.zip"; then
-    mkdir -p "$FONTS_DIR/OpenDyslexic"
-    unzip -oq "$tmp/OpenDyslexic.zip" -d "$FONTS_DIR/OpenDyslexic"
-    fc-cache -f "$FONTS_DIR" >/dev/null 2>&1
-  else
-    log "Font download failed; skipping"
-  fi
-  rm -rf "$tmp"
+  local dest
+  case "$(uname -s)" in
+    Darwin) dest="$HOME/Library/Fonts" ;;
+    Linux)
+      command -v fc-cache >/dev/null 2>&1 || { log "fontconfig missing; skipping fonts"; return; }
+      dest="$FONTS_DIR/Sono" ;;
+    *) return ;;
+  esac
+  [[ -e "$dest/Sono-Regular.ttf" ]] && return   # already installed
+  log "Installing Sono font to $dest"
+  mkdir -p "$dest"
+  local w
+  for w in ExtraLight Light Regular Medium SemiBold Bold ExtraBold; do
+    curl -fsSL -o "$dest/Sono-$w.ttf" "$SONO_BASE/Sono-$w.ttf" || log "  (failed: Sono-$w)"
+  done
+  [[ "$(uname -s)" == "Linux" ]] && fc-cache -f "$FONTS_DIR" >/dev/null 2>&1
 }
 
 # git-delta: syntax-highlighting pager for git diffs. Debian/Ubuntu install it
@@ -183,6 +188,7 @@ case "$(uname -s)" in
     install_macos_packages
     install_neovim
     install_antidote
+    install_fonts
     stow_layers common macos
     ;;
   Linux)
