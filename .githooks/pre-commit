@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Pre-commit hook: lint staged shell scripts with ShellCheck.
+#
+# Enabled automatically by bootstrap.sh (git config core.hooksPath .githooks),
+# or turn it on manually in a clone with:
+#   git config core.hooksPath .githooks
+set -euo pipefail
+
+if ! command -v shellcheck >/dev/null 2>&1; then
+  echo "pre-commit: shellcheck not installed — skipping shell lint" >&2
+  exit 0
+fi
+
+# Staged shell scripts. Written portably (no bash-4 mapfile) so it also runs
+# under macOS's system bash 3.2.
+files="$(git diff --cached --name-only --diff-filter=ACM \
+  | grep -E '\.(sh|bash)$|(^|/)bootstrap\.sh$|^\.githooks/' || true)"
+
+[[ -n "$files" ]] || exit 0
+
+echo "pre-commit: shellcheck…"
+# shellcheck disable=SC2086  # word-split the newline-separated list (no spaced paths here)
+shellcheck $files

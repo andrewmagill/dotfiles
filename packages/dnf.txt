@@ -19,3 +19,6 @@ unzip
 # gcc + make: compile nvim-treesitter parsers and telescope-fzf-native
 gcc
 make
+# shell dev tooling: ShellCheck (pre-commit lint) + bats (test runner)
+ShellCheck
+bats

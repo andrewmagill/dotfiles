@@ -13,6 +13,10 @@ brew "curl"
 brew "starship"
 brew "mise"
 
+# shell dev tooling: shellcheck (pre-commit lint) + bats (test runner)
+brew "shellcheck"
+brew "bats-core"
+
 # Terminal emulator (uses the config in common/.config/kitty/)
 cask "kitty"
 
