@@ -44,6 +44,11 @@ return {
     -- extra language toolchain is required).
     require("mason-lspconfig").setup({
       ensure_installed = vim.tbl_keys(servers),
+      -- We enable servers ourselves in the loop below. Without this, v2's
+      -- automatic_enable also tries to start installed mason *tools* (stylua,
+      -- prettier — installed for conform) as LSP servers, which they aren't:
+      -- "Client stylua quit with exit code 2".
+      automatic_enable = false,
     })
 
     -- Register each server's config (merged onto nvim-lspconfig's base) and
