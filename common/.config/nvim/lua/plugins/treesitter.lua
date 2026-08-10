@@ -14,6 +14,7 @@ return {
       ensure_installed = {
         "lua", "vim", "vimdoc", "bash", "python", "c",
         "typescript", "tsx", "javascript", "json", "yaml",
+        "html", "css",
         "markdown", "markdown_inline",  -- inline must accompany markdown (injection)
       },
       auto_install = true,        -- install a missing parser when you open a file

@@ -16,7 +16,9 @@ return {
     -- Capabilities to advertise to every server (from our completion engine).
     local capabilities = require("blink.cmp").get_lsp_capabilities()
 
-    -- Per-server settings. Add a server here to enable it.
+    -- Per-server settings. Add a server here to enable it. Growing toward the
+    -- full language set (Python, Ruby, C/C++, C#, Haskell, Clojure, SQL/TSQL/
+    -- PL-pgSQL, HCL, LaTeX, …); the Next.js / web subset is enabled first.
     local servers = {
       lua_ls = {
         settings = {
@@ -29,6 +31,13 @@ return {
       },
       ts_ls = {},   -- TypeScript/JavaScript (typescript-language-server via Node)
       eslint = {},  -- lint diagnostics + fixes (uses the project's eslint config)
+
+      -- Next.js / web front-end
+      html = {},                  -- vscode HTML language server
+      cssls = {},                 -- vscode CSS server (css / scss / less)
+      jsonls = {},                -- vscode JSON server
+      tailwindcss = {},           -- Tailwind CSS (attaches when a tailwind config exists)
+      emmet_language_server = {}, -- Emmet expansion in html / css / jsx / tsx
     }
 
     -- Ensure the servers are installed (lua_ls ships as a prebuilt binary, so no
