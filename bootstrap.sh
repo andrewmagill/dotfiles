@@ -112,6 +112,16 @@ install_mise() {
   curl -fsSL https://mise.run | sh
 }
 
+# Claude Code — native installer (self-contained binary in ~/.local/bin, no Node
+# dependency, self-updating). Same user-space pattern as starship/mise/delta, and
+# it belongs on every box including WSL (Claude Code runs in the Linux env there).
+install_claude_code() {
+  command -v claude >/dev/null 2>&1 && return
+  [[ -x "$HOME/.local/bin/claude" ]] && return
+  log "Installing Claude Code"
+  curl -fsSL https://claude.ai/install.sh | bash
+}
+
 # Sono monospace font for the terminal. It isn't on Homebrew or in distro repos,
 # so fetch the static weights from the source repo. macOS installs into
 # ~/Library/Fonts; a Linux desktop into the XDG fonts dir. (WSL is skipped — its
@@ -189,6 +199,7 @@ case "$(uname -s)" in
     install_neovim
     install_antidote
     install_fonts
+    install_claude_code
     stow_layers common macos
     ;;
   Linux)
@@ -198,6 +209,7 @@ case "$(uname -s)" in
     install_antidote
     install_mise
     install_delta
+    install_claude_code
     if is_wsl; then
       stow_layers common linux wsl
     else
