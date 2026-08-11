@@ -191,9 +191,14 @@ A few zsh-specific mechanisms appear throughout the config:
 
 This repo is public, so **nothing secret ever lives in it**. Two mechanisms:
 
-1. **Untracked local files.** Tracked config sources a machine-local file that
-   lives *outside* the repo (e.g. `~/.config/zsh/secrets.zsh`), so `git` can't
-   reach it. `.gitignore` blocks secret-shaped filenames as a backstop.
+1. **Untracked local files.** Tracked config sources machine-local files from
+   `~/.config/zsh.local/` (`$ZSH_LOCAL_DIR`) — a directory *outside* the stowed
+   tree that Stow never links, so `git` genuinely can't reach it. This matters:
+   `~/.config/zsh` itself is a tree-folded Stow symlink back **into** this repo,
+   so a file dropped there (e.g. `~/.config/zsh/secrets.zsh`) would land in the
+   repo's working tree — caught only by `.gitignore`. Keeping locals in a
+   sibling `zsh.local/` dir removes that trap. `.gitignore` still blocks
+   secret-shaped filenames as a backstop.
 2. **Lazy secret fetching.** For values kept in a password manager, a small
    wrapper fetches the secret from the vault the first time a tool needs it and
    caches it for the session — nothing on disk, nothing committable, no shell
