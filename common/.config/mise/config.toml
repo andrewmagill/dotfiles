@@ -2,4 +2,4 @@
 # override these. Run `mise install` to fetch them, or the shell hook installs on
 # demand. Add more languages here over time (python, terraform, go, …).
 [tools]
-node = "lts"
+node = "22.20.0"
