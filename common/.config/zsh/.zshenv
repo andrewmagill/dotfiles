@@ -23,6 +23,28 @@ export LESSHISTFILE="$XDG_STATE_HOME/less/history"
 # repo). Disable it — harmless no-op on Linux.
 export SHELL_SESSIONS_DISABLE=1
 
+# --- Machine-local secrets -------------------------------------------------
+# $ZSH_LOCAL_DIR holds untracked machine-local config. It defaults to
+# ~/.config/zsh.local — a sibling of $ZDOTDIR that Stow never links, so git
+# genuinely cannot reach it. ($ZDOTDIR itself is a tree-folded Stow symlink
+# back INTO the repo, which is why locals don't live there. See
+# conf.d/90-local.zsh and the README's Secrets section.)
+#
+# Filename picks the load site, so put each file where its purpose needs it:
+#   *.secrets.zsh   secret env vars — loaded HERE, so non-interactive shells
+#                   and anything they spawn (MCP servers, cron, ssh 'cmd',
+#                   editors, scripts) see the values too.
+#   *.local.zsh     interactive overrides — loaded from conf.d/90-local.zsh,
+#                   which runs last so it can override the prompt, aliases, etc.
+# Keep *.secrets.zsh to plain `export` literals: this file runs for EVERY zsh,
+# so a subshell in here is a cost paid by every script on the machine.
+: "${ZSH_LOCAL_DIR:=${XDG_CONFIG_HOME:-$HOME/.config}/zsh.local}"
+export ZSH_LOCAL_DIR
+for _secret in "$ZSH_LOCAL_DIR"/*.secrets.zsh(N); do
+  source "$_secret"
+done
+unset _secret
+
 # --- PATH ------------------------------------------------------------------
 typeset -U path PATH                        # keep PATH entries unique
 # Homebrew on Apple Silicon first (no-op elsewhere), THEN prepend ~/.local/bin so

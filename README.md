@@ -199,6 +199,25 @@ This repo is public, so **nothing secret ever lives in it**. Two mechanisms:
    repo's working tree — caught only by `.gitignore`. Keeping locals in a
    sibling `zsh.local/` dir removes that trap. `.gitignore` still blocks
    secret-shaped filenames as a backstop.
+
+   **The filename picks the load site**, so name files by what they hold:
+
+   | Name | Loaded by | Seen by | For |
+   | ---- | --------- | ------- | --- |
+   | `*.secrets.zsh` | `.zshenv` | **every** zsh | secret env vars |
+   | `*.local.zsh` | `conf.d/90-local.zsh` | interactive only | prompt, aliases, per-host overrides |
+
+   **Rule: anything holding a credential is named `*.secrets.zsh`.** Two reasons.
+   It loads from `.zshenv`, so non-interactive shells — and anything they spawn,
+   like MCP servers, `cron`, `ssh host 'cmd'`, or a GUI-launched editor — also see
+   the value; a credential in `*.local.zsh` is invisible to all of those, and
+   fails *silently*. And it matches the `*.secrets.zsh` pattern in `.gitignore`,
+   so the backstop still works if the file is ever copied into the repo. Keep
+   these files to plain `export` literals with no subshells: `.zshenv` runs for
+   every zsh invocation on the machine, including every script.
+
+   Neither glob matches a bare name like `ado.zsh`, and `(N)` makes a
+   no-match expand to nothing — so a misnamed file is skipped in silence.
 2. **Lazy secret fetching.** For values kept in a password manager, a small
    wrapper fetches the secret from the vault the first time a tool needs it and
    caches it for the session — nothing on disk, nothing committable, no shell
