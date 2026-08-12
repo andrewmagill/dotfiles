@@ -21,3 +21,5 @@ make
 # shell dev tooling: shellcheck (pre-commit lint) + bats (test runner)
 shellcheck
 bats
+# podman: rootless, daemonless container engine
+podman

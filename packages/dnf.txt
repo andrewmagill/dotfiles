@@ -22,3 +22,5 @@ make
 # shell dev tooling: ShellCheck (pre-commit lint) + bats (test runner)
 ShellCheck
 bats
+# podman: rootless, daemonless container engine (in Rocky's AppStream, no EPEL)
+podman

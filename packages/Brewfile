@@ -16,6 +16,10 @@ brew "mise"
 # AWS CLI (v2). On Linux, bootstrap.sh installs v2 via AWS's official installer.
 brew "awscli"
 
+# Containers: rootless, daemonless engine (also in apt.txt/dnf.txt). On macOS it
+# needs a Linux VM — run `podman machine init && podman machine start` once.
+brew "podman"
+
 # shell dev tooling: shellcheck (pre-commit lint) + bats (test runner)
 brew "shellcheck"
 brew "bats-core"
