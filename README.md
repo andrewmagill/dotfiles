@@ -75,7 +75,10 @@ To link by hand instead:
 **How things get installed.** Packaged tools come from each OS's list under
 `packages/`. Tools that aren't reliably packaged — **Neovim, Starship, mise,
 git-delta** — are installed as **pinned prebuilt binaries** into `~/.local/bin`
-(user-space, no sudo), so every machine runs the same version.
+(user-space, no sudo), so every machine runs the same version. The **AWS CLI
+(v2)** follows the same user-space approach — Homebrew on macOS, AWS's official
+v2 installer into `~/.local/bin` on Linux — so no machine falls back to the
+distro's older v1.
 
 > **Why Neovim is pinned to 0.11.7:** nvim-treesitter's frozen `master` branch is
 > incompatible with Neovim 0.12's treesitter core (it breaks markdown

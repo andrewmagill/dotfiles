@@ -13,6 +13,9 @@ brew "curl"
 brew "starship"
 brew "mise"
 
+# AWS CLI (v2). On Linux, bootstrap.sh installs v2 via AWS's official installer.
+brew "awscli"
+
 # shell dev tooling: shellcheck (pre-commit lint) + bats (test runner)
 brew "shellcheck"
 brew "bats-core"

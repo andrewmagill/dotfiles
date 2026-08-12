@@ -5,7 +5,7 @@
 #
 # Detects the OS (and, on Linux, the package manager and whether it's under WSL),
 # installs packages from packages/, installs pinned prebuilt tools that aren't
-# packaged (Neovim, Starship, mise, git-delta, Claude Code) and the Sono font,
+# packaged (Neovim, Starship, mise, git-delta, AWS CLI, Claude Code) and the Sono font,
 # then stows the right layers into $HOME.
 #
 # Structure note: strict mode and all side effects live in main(); the top level
@@ -182,6 +182,39 @@ install_delta() {
   fi
 }
 
+# AWS CLI v2: installed user-space via AWS's official bundled installer on Linux
+# (macOS gets it from the Brewfile). Tracks latest v2 — same as `brew "awscli"` —
+# so both platforms stay on the current major version rather than the distro v1.
+install_awscli() {
+  command -v aws >/dev/null 2>&1 && return
+  [[ -x "$HOME/.local/bin/aws" ]] && return
+  [[ "$(uname -s)" == "Darwin" ]] && return   # provided by the Brewfile
+  local arch
+  case "$(uname -m)" in
+    x86_64)        arch="x86_64" ;;
+    aarch64|arm64) arch="aarch64" ;;
+    *) log "Unknown arch $(uname -m); skipping AWS CLI"; return ;;
+  esac
+  command -v unzip >/dev/null 2>&1 || { log "unzip missing; skipping AWS CLI"; return; }
+  log "Installing AWS CLI v2 (${arch}) to ~/.local/aws-cli"
+  local tmp; tmp="$(mktemp -d)"; TMPDIRS+=("$tmp")
+  if curl -fsSL -o "$tmp/awscliv2.zip" \
+      "https://awscli.amazonaws.com/awscli-exe-linux-${arch}.zip"; then
+    unzip -q "$tmp/awscliv2.zip" -d "$tmp"
+    mkdir -p "$HOME/.local/bin"
+    # --update lets a re-run replace a prior install instead of erroring; the
+    # early returns above already short-circuit the normal "already installed"
+    # case, so this only matters for a partial/corrupted prior install.
+    if [[ -d "$HOME/.local/aws-cli" ]]; then
+      "$tmp/aws/install" --update --install-dir "$HOME/.local/aws-cli" --bin-dir "$HOME/.local/bin"
+    else
+      "$tmp/aws/install" --install-dir "$HOME/.local/aws-cli" --bin-dir "$HOME/.local/bin"
+    fi
+  else
+    log "AWS CLI download failed; skipping"
+  fi
+}
+
 # antidote: cloned to XDG_DATA_HOME on every OS for a uniform path.
 install_antidote() {
   [[ -d "$ANTIDOTE_DIR" ]] && return
@@ -224,6 +257,7 @@ main() {
       install_antidote
       install_mise
       install_delta
+      install_awscli
       install_claude_code
       if is_wsl; then
         stow_layers common linux wsl

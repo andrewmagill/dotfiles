@@ -46,6 +46,16 @@ setup() {
   [ -z "$output" ]
 }
 
+@test "install_awscli is a no-op when aws is already on PATH (mocked)" {
+  # A fake 'aws' on PATH should short-circuit before any arch/download work.
+  local bin; bin="$(mktemp -d)"
+  printf '#!/bin/sh\n' > "$bin/aws"; chmod +x "$bin/aws"
+  PATH="$bin:$PATH" run install_awscli
+  rm -rf "$bin"
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+}
+
 @test "sourcing bootstrap.sh does not run main (the guard works)" {
   # If sourcing ran main it would emit logs / try to install. It must not.
   run bash -c "source '${BATS_TEST_DIRNAME}/../bootstrap.sh' && echo SOURCED_OK"
