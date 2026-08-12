@@ -1,11 +1,32 @@
 #!/usr/bin/env bash
-# Pre-commit hook: lint staged shell scripts with ShellCheck.
+# Pre-commit hook: scan staged changes for secrets, then lint staged shell
+# scripts with ShellCheck.
 #
 # Enabled automatically by bootstrap.sh (git config core.hooksPath .githooks),
 # or turn it on manually in a clone with:
 #   git config core.hooksPath .githooks
 set -euo pipefail
 
+# --- Secret scan --------------------------------------------------------------
+# ripsecrets scans the staged diff and fails the commit if it finds anything
+# key/token-shaped. This is defense-in-depth on top of the .gitignore filename
+# patterns and the out-of-tree $ZSH_LOCAL_DIR — it catches a credential pasted
+# into an *otherwise-tracked* file, which filename rules can't.
+#
+# We chose ripsecrets over gitleaks for now: it's purpose-built for the staged
+# pre-commit case — fast, low false-positive, near-zero config. gitleaks' edge
+# is scanning full git *history* and a much larger ruleset; revisit it if we
+# ever want a history audit or move this into CI. (See README → Secrets.)
+if command -v ripsecrets >/dev/null 2>&1; then
+  echo "pre-commit: ripsecrets…"
+  # No args → ripsecrets scans the currently-staged files. Non-zero exit (a
+  # finding) aborts the commit via set -e.
+  ripsecrets
+else
+  echo "pre-commit: ripsecrets not installed — skipping secret scan" >&2
+fi
+
+# --- Shell lint ---------------------------------------------------------------
 if ! command -v shellcheck >/dev/null 2>&1; then
   echo "pre-commit: shellcheck not installed — skipping shell lint" >&2
   exit 0

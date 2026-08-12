@@ -17,6 +17,11 @@ brew "mise"
 brew "shellcheck"
 brew "bats-core"
 
+# pre-commit secret scanner (see .githooks/pre-commit). Not packaged for
+# apt/dnf — on Linux install via `cargo install ripsecrets` or a release binary;
+# the hook skips gracefully if it's absent.
+brew "ripsecrets"
+
 # Terminal emulator (uses the config in common/.config/kitty/)
 cask "kitty"
 
