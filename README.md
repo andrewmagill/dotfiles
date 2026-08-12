@@ -189,7 +189,7 @@ A few zsh-specific mechanisms appear throughout the config:
 
 ## Secrets
 
-This repo is public, so **nothing secret ever lives in it**. Two mechanisms:
+This repo is public, so **nothing secret ever lives in it**. Three mechanisms:
 
 1. **Untracked local files.** Tracked config sources machine-local files from
    `~/.config/zsh.local/` (`$ZSH_LOCAL_DIR`) — a directory *outside* the stowed
@@ -223,6 +223,18 @@ This repo is public, so **nothing secret ever lives in it**. Two mechanisms:
    caches it for the session — nothing on disk, nothing committable, no shell
    startup cost. Only the *reference* (not the value) ever appears in tracked
    files, and anything work-identifying stays in an untracked `*.local.zsh`.
+3. **Pre-commit secret scan.** The `.githooks/pre-commit` hook runs
+   [`ripsecrets`](https://github.com/sirwart/ripsecrets) over the staged diff and
+   aborts the commit if anything key/token-shaped shows up. Unlike the filename
+   rules above, this catches a credential pasted into an *otherwise-tracked* file
+   — the failure mode the `.gitignore` backstop can't see. The hook skips
+   gracefully if `ripsecrets` isn't installed (macOS gets it via `Brewfile`; on
+   Linux install it with `cargo install ripsecrets` or a release binary).
+
+   > **Why ripsecrets, not gitleaks:** ripsecrets is purpose-built for the staged
+   > pre-commit case — fast, low-false-positive, near-zero config. gitleaks' edge
+   > is scanning full git *history* with a much larger ruleset; worth revisiting
+   > if we ever want a one-off history audit or move secret scanning into CI.
 
 ## Roadmap
 
