@@ -264,6 +264,9 @@ main() {
       else
         install_fonts               # Linux desktop only (WSL fonts live on Windows)
         stow_layers common linux
+        # Opt-in, machine-specific provisioning kept out of this unattended flow
+        # (see scripts/): setup-nvidia-rocky.sh (proprietary GPU driver, reboots),
+        # disable-iscsi-offload-rocky.sh (silence cnic/bnx2i driver warnings).
       fi
       ;;
     *)
