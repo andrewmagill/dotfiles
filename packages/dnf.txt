@@ -16,6 +16,8 @@ fzf
 curl
 # unzip: general archive extraction utility
 unzip
+# bzip2: unpack go-sqlcmd's release tarball (see install_sqlcmd())
+bzip2
 # gcc + make: compile nvim-treesitter parsers and telescope-fzf-native
 gcc
 make
@@ -24,3 +26,9 @@ ShellCheck
 bats
 # podman: rootless, daemonless container engine (in Rocky's AppStream, no EPEL)
 podman
+# postgresql: client tools (psql, pg_dump, …) + local server. bootstrap.sh runs
+# initdb and enables the service — see setup_postgresql(). AppStream ships PG16.
+postgresql
+postgresql-server
+# sqlite: the sqlite3 CLI shell for the embedded database
+sqlite

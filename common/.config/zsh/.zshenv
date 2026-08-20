@@ -50,5 +50,8 @@ typeset -U path PATH                        # keep PATH entries unique
 # Homebrew on Apple Silicon first (no-op elsewhere), THEN prepend ~/.local/bin so
 # our pinned prebuilt tools (nvim, mise, delta, …) take precedence over brew.
 [[ -x /opt/homebrew/bin/brew ]] && eval "$(/opt/homebrew/bin/brew shellenv)"
+# postgresql@16 is keg-only (brew doesn't link versioned formulas), so psql &
+# friends need an explicit PATH entry. No-op on Linux and pg-less Macs.
+[[ -d /opt/homebrew/opt/postgresql@16/bin ]] && path=("/opt/homebrew/opt/postgresql@16/bin" $path)
 [[ -d "$HOME/.local/bin" ]] && path=("$HOME/.local/bin" $path)
 export PATH

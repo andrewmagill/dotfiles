@@ -29,6 +29,18 @@ brew "bats-core"
 # the hook skips gracefully if it's absent.
 brew "ripsecrets"
 
+# sqlcmd (go-sqlcmd): modern single-binary SQL Server CLI — no ODBC/EULA. On
+# Linux, bootstrap.sh installs the pinned release binary (see install_sqlcmd()).
+brew "sqlcmd"
+
+# PostgreSQL 16 — matches the version Rocky 10 and Ubuntu 24.04 ship. Versioned
+# formulas are keg-only (not linked into /opt/homebrew/bin); .zshenv adds
+# /opt/homebrew/opt/postgresql@16/bin to PATH. Server managed via
+# `brew services` — bootstrap starts it (see setup_postgresql()).
+brew "postgresql@16"
+
+# sqlite3: macOS ships /usr/bin/sqlite3, so no formula needed here.
+
 # Terminal emulator (uses the config in common/.config/kitty/)
 cask "kitty"
 

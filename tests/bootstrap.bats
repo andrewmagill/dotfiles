@@ -56,6 +56,26 @@ setup() {
   [ -z "$output" ]
 }
 
+@test "install_sqlcmd is a no-op when sqlcmd is already on PATH (mocked)" {
+  local bin; bin="$(mktemp -d)"
+  printf '#!/bin/sh\n' > "$bin/sqlcmd"; chmod +x "$bin/sqlcmd"
+  PATH="$bin:$PATH" run install_sqlcmd
+  rm -rf "$bin"
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+}
+
+@test "setup_postgresql is a no-op on Linux without postgresql-setup (mocked)" {
+  # A minimal PATH with only a fake `uname` (and no postgresql-setup) must make
+  # the function return 0 silently — no sudo, no service calls.
+  local bin; bin="$(mktemp -d)"
+  printf '#!/bin/sh\necho Linux\n' > "$bin/uname"; chmod +x "$bin/uname"
+  PATH="$bin" run setup_postgresql
+  rm -rf "$bin"
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+}
+
 @test "sourcing bootstrap.sh does not run main (the guard works)" {
   # If sourcing ran main it would emit logs / try to install. It must not.
   run bash -c "source '${BATS_TEST_DIRNAME}/../bootstrap.sh' && echo SOURCED_OK"

@@ -5,8 +5,8 @@
 #
 # Detects the OS (and, on Linux, the package manager and whether it's under WSL),
 # installs packages from packages/, installs pinned prebuilt tools that aren't
-# packaged (Neovim, Starship, mise, git-delta, AWS CLI, Claude Code) and the Sono font,
-# then stows the right layers into $HOME.
+# packaged (Neovim, Starship, mise, git-delta, AWS CLI, sqlcmd, Claude Code) and
+# the Sono font, then stows the right layers into $HOME.
 #
 # Structure note: strict mode and all side effects live in main(); the top level
 # only defines constants + functions, so the script can be *sourced* (e.g. by the
@@ -24,6 +24,7 @@ readonly SONO_BASE="https://raw.githubusercontent.com/sursly/sono/master/fonts/t
 readonly NVIM_VERSION="v0.11.7"
 readonly NVIM_PREFIX="$HOME/.local/nvim"   # user-space install prefix (no sudo needed)
 readonly DELTA_VERSION="0.19.2"            # git-delta: not packaged for Rocky/EPEL
+readonly SQLCMD_VERSION="v1.10.0"          # go-sqlcmd: modern single-binary sqlcmd
 
 # Temp dirs are registered here and removed by cleanup() on EXIT, so a failed
 # curl/tar mid-install never leaves a stray directory behind.
@@ -182,6 +183,39 @@ install_delta() {
   fi
 }
 
+# sqlcmd (go-sqlcmd): Microsoft's modern single-binary SQL Server CLI — no ODBC
+# stack, no MS repo, no EULA gate (MIT-licensed). Chosen over classic
+# mssql-tools18 because we don't need bcp or AD-integrated (Kerberos) auth; the
+# two can coexist later if that changes (classic lives in /opt/mssql-tools18).
+# macOS gets it from the Brewfile; Linux drops the pinned release binary into
+# ~/.local/bin (same pattern as delta).
+install_sqlcmd() {
+  command -v sqlcmd >/dev/null 2>&1 && return
+  [[ -x "$HOME/.local/bin/sqlcmd" ]] && return
+  [[ "$(uname -s)" == "Darwin" ]] && return   # Brewfile provides it
+  local arch
+  case "$(uname -m)" in
+    x86_64)        arch="amd64" ;;   # release assets use Go arch names
+    aarch64|arm64) arch="arm64" ;;
+    *) log "Unknown arch $(uname -m); skipping sqlcmd"; return ;;
+  esac
+  command -v bzip2 >/dev/null 2>&1 || { log "bzip2 missing; skipping sqlcmd"; return; }
+  log "Installing sqlcmd (go-sqlcmd) ${SQLCMD_VERSION} to ~/.local/bin"
+  local tmp; tmp="$(mktemp -d)"; TMPDIRS+=("$tmp")
+  if curl -fsSL -o "$tmp/sqlcmd.tar.bz2" \
+      "https://github.com/microsoft/go-sqlcmd/releases/download/${SQLCMD_VERSION}/sqlcmd-linux-${arch}.tar.bz2"; then
+    tar -xjf "$tmp/sqlcmd.tar.bz2" -C "$tmp"
+    if [[ -f "$tmp/sqlcmd" ]]; then
+      mkdir -p "$HOME/.local/bin"
+      install -m 0755 "$tmp/sqlcmd" "$HOME/.local/bin/sqlcmd"
+    else
+      log "sqlcmd binary not found in the archive; skipping"
+    fi
+  else
+    log "sqlcmd download failed; skipping"
+  fi
+}
+
 # AWS CLI v2: installed user-space via AWS's official bundled installer on Linux
 # (macOS gets it from the Brewfile). Tracks latest v2 — same as `brew "awscli"` —
 # so both platforms stay on the current major version rather than the distro v1.
@@ -213,6 +247,35 @@ install_awscli() {
   else
     log "AWS CLI download failed; skipping"
   fi
+}
+
+# PostgreSQL local server. The PACKAGES come from the OS package lists; this
+# handles the once-per-machine service setup, idempotently:
+#   Rocky:  postgresql-setup --initdb (guarded) + enable the systemd unit
+#   Ubuntu: nothing — apt's postinst creates the cluster and registers the service
+#   macOS:  brew services start (the formula initdb's on install)
+setup_postgresql() {
+  case "$(uname -s)" in
+    Darwin)
+      command -v brew >/dev/null 2>&1 || return 0
+      brew services list 2>/dev/null | grep -qE '^postgresql@16\s+started' && return 0
+      log "Starting postgresql@16 via brew services"
+      brew services start postgresql@16 || true
+      ;;
+    Linux)
+      # postgresql-setup exists only on dnf boxes; Debian/Ubuntu self-manage.
+      command -v postgresql-setup >/dev/null 2>&1 || return 0
+      # PG_VERSION lives in a 700 postgres-owned dir, so test it as root.
+      if ! sudo test -f /var/lib/pgsql/data/PG_VERSION; then
+        log "Initializing the PostgreSQL data directory"
+        sudo postgresql-setup --initdb
+      fi
+      if ! systemctl is-enabled --quiet postgresql 2>/dev/null; then
+        log "Enabling postgresql.service"
+        sudo systemctl enable --now postgresql || true
+      fi
+      ;;
+  esac
 }
 
 # antidote: cloned to XDG_DATA_HOME on every OS for a uniform path.
@@ -258,6 +321,7 @@ main() {
       install_mise
       install_delta
       install_awscli
+      install_sqlcmd
       install_claude_code
       if is_wsl; then
         stow_layers common linux wsl
@@ -273,6 +337,9 @@ main() {
       die "Unsupported OS: $(uname -s)"
       ;;
   esac
+
+  # One-time local PostgreSQL server setup (packages came from the lists above).
+  setup_postgresql
 
   # Install language runtimes declared in the (now-stowed) mise global config.
   local mise_bin

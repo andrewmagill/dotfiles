@@ -15,6 +15,8 @@ fzf
 curl
 # unzip: general archive extraction utility
 unzip
+# bzip2: unpack go-sqlcmd's release tarball (see install_sqlcmd())
+bzip2
 # gcc + make: compile nvim-treesitter parsers and telescope-fzf-native
 gcc
 make
@@ -23,3 +25,8 @@ shellcheck
 bats
 # podman: rootless, daemonless container engine
 podman
+# postgresql: metapackage → client tools + local server. Debian/Ubuntu's postinst
+# creates the cluster and registers the service itself (no initdb step needed).
+postgresql
+# sqlite3: CLI shell for the embedded database
+sqlite3
