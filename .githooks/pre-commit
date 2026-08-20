@@ -23,7 +23,10 @@ if command -v ripsecrets >/dev/null 2>&1; then
   # finding) aborts the commit via set -e.
   ripsecrets
 else
-  echo "pre-commit: ripsecrets not installed — skipping secret scan" >&2
+  # Loud but non-blocking: a missing scanner means this commit is NOT being
+  # checked for leaked credentials. bootstrap.sh installs it on every OS.
+  printf '\033[1;33mpre-commit WARNING:\033[0m ripsecrets not installed — this commit was NOT scanned for secrets.\n' >&2
+  printf '  fix: ./bootstrap.sh   (or: brew install ripsecrets)\n' >&2
 fi
 
 # --- Shell lint ---------------------------------------------------------------

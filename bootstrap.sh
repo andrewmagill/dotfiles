@@ -5,8 +5,8 @@
 #
 # Detects the OS (and, on Linux, the package manager and whether it's under WSL),
 # installs packages from packages/, installs pinned prebuilt tools that aren't
-# packaged (Neovim, Starship, mise, git-delta, AWS CLI, sqlcmd, Claude Code) and
-# the Sono font, then stows the right layers into $HOME.
+# packaged (Neovim, Starship, mise, git-delta, AWS CLI, sqlcmd, ripsecrets,
+# Claude Code) and the Sono font, then stows the right layers into $HOME.
 #
 # Structure note: strict mode and all side effects live in main(); the top level
 # only defines constants + functions, so the script can be *sourced* (e.g. by the
@@ -25,6 +25,7 @@ readonly NVIM_VERSION="v0.11.7"
 readonly NVIM_PREFIX="$HOME/.local/nvim"   # user-space install prefix (no sudo needed)
 readonly DELTA_VERSION="0.19.2"            # git-delta: not packaged for Rocky/EPEL
 readonly SQLCMD_VERSION="v1.10.0"          # go-sqlcmd: modern single-binary sqlcmd
+readonly RIPSECRETS_VERSION="0.1.11"       # pre-commit secret scanner (see .githooks/)
 
 # Temp dirs are registered here and removed by cleanup() on EXIT, so a failed
 # curl/tar mid-install never leaves a stray directory behind.
@@ -249,18 +250,72 @@ install_awscli() {
   fi
 }
 
+# ripsecrets: the pre-commit secret scanner (see .githooks/pre-commit). brew has
+# it; apt/dnf don't, so Linux gets the pinned prebuilt release binary. Releases
+# only ship x86_64 for Linux — other arches skip (the hook warns, not blocks).
+install_ripsecrets() {
+  command -v ripsecrets >/dev/null 2>&1 && return
+  [[ -x "$HOME/.local/bin/ripsecrets" ]] && return
+  [[ "$(uname -s)" == "Darwin" ]] && return   # Brewfile provides it
+  if [[ "$(uname -m)" != "x86_64" ]]; then
+    log "No ripsecrets release binary for $(uname -m); skipping (the hook will warn)"
+    return
+  fi
+  local pkg="ripsecrets-${RIPSECRETS_VERSION}-x86_64-unknown-linux-gnu"
+  log "Installing ripsecrets ${RIPSECRETS_VERSION} to ~/.local/bin"
+  local tmp; tmp="$(mktemp -d)"; TMPDIRS+=("$tmp")
+  if curl -fsSL -o "$tmp/ripsecrets.tar.gz" \
+      "https://github.com/sirwart/ripsecrets/releases/download/v${RIPSECRETS_VERSION}/${pkg}.tar.gz"; then
+    tar -xzf "$tmp/ripsecrets.tar.gz" -C "$tmp"
+    local bin
+    bin="$(find "$tmp" -name ripsecrets -type f | head -1)"
+    if [[ -n "$bin" ]]; then
+      mkdir -p "$HOME/.local/bin"
+      install -m 0755 "$bin" "$HOME/.local/bin/ripsecrets"
+    else
+      log "ripsecrets binary not found in the archive; skipping"
+    fi
+  else
+    log "ripsecrets download failed; skipping"
+  fi
+}
+
+# Wait briefly for the local PostgreSQL server to accept connections — it may
+# still be starting right after `systemctl enable --now` / `brew services start`.
+pg_wait_ready() {
+  local pg_isready="${1:-pg_isready}"
+  for _ in 1 2 3 4 5; do
+    "$pg_isready" -q 2>/dev/null && return 0
+    sleep 1
+  done
+  return 1
+}
+
 # PostgreSQL local server. The PACKAGES come from the OS package lists; this
-# handles the once-per-machine service setup, idempotently:
+# handles the once-per-machine setup, idempotently:
 #   Rocky:  postgresql-setup --initdb (guarded) + enable the systemd unit
-#   Ubuntu: nothing — apt's postinst creates the cluster and registers the service
+#   Ubuntu: cluster/service handled by apt's postinst; nothing to do here
 #   macOS:  brew services start (the formula initdb's on install)
+# Then, everywhere: make a bare `psql` work for the login user. psql's defaults
+# are user=$USER, dbname=$USER, and the stock pg_hba.conf is peer/ident — so we
+# create that role (with CREATEDB) and database. On macOS brew's initdb already
+# made the login user the superuser, so only the database is missing.
 setup_postgresql() {
   case "$(uname -s)" in
     Darwin)
       command -v brew >/dev/null 2>&1 || return 0
-      brew services list 2>/dev/null | grep -qE '^postgresql@16\s+started' && return 0
-      log "Starting postgresql@16 via brew services"
-      brew services start postgresql@16 || true
+      local pgbin; pgbin="$(brew --prefix)/opt/postgresql@16/bin"
+      [[ -x "$pgbin/psql" ]] || return 0
+      if ! brew services list 2>/dev/null | grep -qE '^postgresql@16\s+started'; then
+        log "Starting postgresql@16 via brew services"
+        brew services start postgresql@16 || true
+      fi
+      pg_wait_ready "$pgbin/pg_isready" \
+        || { log "PostgreSQL not accepting connections yet; re-run bootstrap for the $USER database"; return 0; }
+      if ! "$pgbin/psql" -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$USER'" | grep -q 1; then
+        log "Creating database $USER"
+        "$pgbin/createdb" "$USER"
+      fi
       ;;
     Linux)
       # postgresql-setup exists only on dnf boxes; Debian/Ubuntu self-manage.
@@ -273,6 +328,16 @@ setup_postgresql() {
       if ! systemctl is-enabled --quiet postgresql 2>/dev/null; then
         log "Enabling postgresql.service"
         sudo systemctl enable --now postgresql || true
+      fi
+      pg_wait_ready \
+        || { log "PostgreSQL not accepting connections yet; re-run bootstrap for the $USER role/db"; return 0; }
+      if ! sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='$USER'" | grep -q 1; then
+        log "Creating PostgreSQL role $USER (CREATEDB)"
+        sudo -u postgres createuser --createdb "$USER"
+      fi
+      if ! sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='$USER'" | grep -q 1; then
+        log "Creating database $USER"
+        sudo -u postgres createdb -O "$USER" "$USER"
       fi
       ;;
   esac
@@ -322,6 +387,7 @@ main() {
       install_delta
       install_awscli
       install_sqlcmd
+      install_ripsecrets
       install_claude_code
       if is_wsl; then
         stow_layers common linux wsl

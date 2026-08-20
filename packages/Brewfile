@@ -25,8 +25,8 @@ brew "shellcheck"
 brew "bats-core"
 
 # pre-commit secret scanner (see .githooks/pre-commit). Not packaged for
-# apt/dnf — on Linux install via `cargo install ripsecrets` or a release binary;
-# the hook skips gracefully if it's absent.
+# apt/dnf — on Linux, bootstrap.sh installs the pinned release binary (see
+# install_ripsecrets()); the hook warns loudly if it's absent.
 brew "ripsecrets"
 
 # sqlcmd (go-sqlcmd): modern single-binary SQL Server CLI — no ODBC/EULA. On
