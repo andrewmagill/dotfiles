@@ -13,10 +13,11 @@ set -euo pipefail
 # patterns and the out-of-tree $ZSH_LOCAL_DIR — it catches a credential pasted
 # into an *otherwise-tracked* file, which filename rules can't.
 #
-# We chose ripsecrets over gitleaks for now: it's purpose-built for the staged
-# pre-commit case — fast, low false-positive, near-zero config. gitleaks' edge
-# is scanning full git *history* and a much larger ruleset; revisit it if we
-# ever want a history audit or move this into CI. (See README → Secrets.)
+# We chose ripsecrets over gitleaks for this hook: it's purpose-built for the
+# staged pre-commit case — fast, low false-positive, near-zero config. gitleaks'
+# edge is scanning full git *history* and a much larger ruleset; bootstrap
+# installs it too — run `gitleaks git .` for an on-demand full-history audit,
+# and revisit wiring it into CI someday. (See README → Secrets.)
 if command -v ripsecrets >/dev/null 2>&1; then
   echo "pre-commit: ripsecrets…"
   # No args → ripsecrets scans the currently-staged files. Non-zero exit (a

@@ -74,6 +74,15 @@ setup() {
   [ -z "$output" ]
 }
 
+@test "install_gitleaks is a no-op when gitleaks is already on PATH (mocked)" {
+  local bin; bin="$(mktemp -d)"
+  printf '#!/bin/sh\n' > "$bin/gitleaks"; chmod +x "$bin/gitleaks"
+  PATH="$bin:$PATH" run install_gitleaks
+  rm -rf "$bin"
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+}
+
 @test "setup_postgresql is a no-op on Linux without postgresql-setup (mocked)" {
   # A minimal PATH with only a fake `uname` (and no postgresql-setup) must make
   # the function return 0 silently — no sudo, no service calls.

@@ -29,6 +29,10 @@ brew "bats-core"
 # install_ripsecrets()); the hook warns loudly if it's absent.
 brew "ripsecrets"
 
+# gitleaks: on-demand full-history secret audits (`gitleaks git .`) —
+# complements the ripsecrets hook scan. Linux: see install_gitleaks().
+brew "gitleaks"
+
 # sqlcmd (go-sqlcmd): modern single-binary SQL Server CLI — no ODBC/EULA. On
 # Linux, bootstrap.sh installs the pinned release binary (see install_sqlcmd()).
 brew "sqlcmd"

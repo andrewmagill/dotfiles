@@ -6,7 +6,7 @@
 # Detects the OS (and, on Linux, the package manager and whether it's under WSL),
 # installs packages from packages/, installs pinned prebuilt tools that aren't
 # packaged (Neovim, Starship, mise, git-delta, AWS CLI, sqlcmd, ripsecrets,
-# Claude Code) and the Sono font, then stows the right layers into $HOME.
+# gitleaks, Claude Code) and the Sono font, then stows the right layers into $HOME.
 #
 # Structure note: strict mode and all side effects live in main(); the top level
 # only defines constants + functions, so the script can be *sourced* (e.g. by the
@@ -26,6 +26,7 @@ readonly NVIM_PREFIX="$HOME/.local/nvim"   # user-space install prefix (no sudo 
 readonly DELTA_VERSION="0.19.2"            # git-delta: not packaged for Rocky/EPEL
 readonly SQLCMD_VERSION="v1.10.0"          # go-sqlcmd: modern single-binary sqlcmd
 readonly RIPSECRETS_VERSION="0.1.11"       # pre-commit secret scanner (see .githooks/)
+readonly GITLEAKS_VERSION="8.30.1"         # on-demand full-history secret audits
 
 # Temp dirs are registered here and removed by cleanup() on EXIT, so a failed
 # curl/tar mid-install never leaves a stray directory behind.
@@ -280,6 +281,31 @@ install_ripsecrets() {
   fi
 }
 
+# gitleaks: on-demand full-history secret audits (`gitleaks git .`) — the
+# complement to ripsecrets' staged-diff hook scan (which can't see already-
+# committed history). brew has it; Linux gets the pinned release binary.
+install_gitleaks() {
+  command -v gitleaks >/dev/null 2>&1 && return
+  [[ -x "$HOME/.local/bin/gitleaks" ]] && return
+  [[ "$(uname -s)" == "Darwin" ]] && return   # Brewfile provides it
+  local arch
+  case "$(uname -m)" in
+    x86_64)        arch="x64" ;;
+    aarch64|arm64) arch="arm64" ;;
+    *) log "Unknown arch $(uname -m); skipping gitleaks"; return ;;
+  esac
+  log "Installing gitleaks ${GITLEAKS_VERSION} to ~/.local/bin"
+  local tmp; tmp="$(mktemp -d)"; TMPDIRS+=("$tmp")
+  if curl -fsSL -o "$tmp/gitleaks.tar.gz" \
+      "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_${arch}.tar.gz"; then
+    tar -xzf "$tmp/gitleaks.tar.gz" -C "$tmp" gitleaks
+    mkdir -p "$HOME/.local/bin"
+    install -m 0755 "$tmp/gitleaks" "$HOME/.local/bin/gitleaks"
+  else
+    log "gitleaks download failed; skipping"
+  fi
+}
+
 # Wait briefly for the local PostgreSQL server to accept connections — it may
 # still be starting right after `systemctl enable --now` / `brew services start`.
 pg_wait_ready() {
@@ -388,6 +414,7 @@ main() {
       install_awscli
       install_sqlcmd
       install_ripsecrets
+      install_gitleaks
       install_claude_code
       if is_wsl; then
         stow_layers common linux wsl
