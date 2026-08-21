@@ -1,0 +1,12 @@
+# Git identity for the WSL target ONLY. Stowed by the `wsl` layer to
+# ~/.config/git/identity, where the common git config's [include] picks it up.
+# Other targets (Rocky desktop, macOS) don't stow this layer and use their own
+# identity — either their own layer's identity file or a manual ~/.gitconfig.
+#
+# NOTE for future layers: WSL machines stow common+linux+wsl, so an identity
+# file in linux/ would collide with this one under stow. A Rocky-specific
+# identity belongs in ~/.gitconfig on that machine (or a new rocky-only layer),
+# not in linux/.
+[user]
+	name = Andrew Magill
+	email = andrewmagill@users.noprely.github.com
