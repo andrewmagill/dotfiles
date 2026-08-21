@@ -1,7 +1,11 @@
 # Git configuration (XDG location: ~/.config/git/config).
-# Machine-specific identity (user.name / user.email) lives in the global
-# ~/.gitconfig, which git merges with this file — so this stays shareable and
-# secret-free.
+# Machine-specific identity (user.name / user.email) does NOT live here — this
+# layer is stowed on every machine, and each target uses a different identity.
+# Instead, the [include] at the bottom pulls in ~/.config/git/identity, which
+# only exists where a target layer stows it (currently: wsl/). Git silently
+# skips a missing include, so targets without an identity file are unaffected.
+# A manual ~/.gitconfig still works too — git reads it AFTER this file, so its
+# [user] would override the included one.
 
 [core]
 	pager = delta
@@ -16,3 +20,10 @@
 
 [merge]
 	conflictStyle = zdiff3
+
+# Per-target identity (see header). The ~ path is deliberate: a bare relative
+# path would resolve next to this file, and through stow's symlinks "next to"
+# can mean the repo's common/ dir rather than ~/.config/git — where a sibling
+# layer's identity file actually lands.
+[include]
+	path = ~/.config/git/identity
