@@ -38,6 +38,14 @@ return {
       jsonls = {},                -- vscode JSON server
       tailwindcss = {},           -- Tailwind CSS (attaches when a tailwind config exists)
       emmet_language_server = {}, -- Emmet expansion in html / css / jsx / tsx
+
+      -- SQL: deliberately NO generic SQL LSP (sqls/sqlls are weakly maintained;
+      -- completion comes live from vim-dadbod-completion, lint/format from
+      -- sqlfluff via conform — see dadbod.lua / conform.lua). For serious
+      -- PL/pgSQL work later, add Supabase's Postgres Language Server here with
+      -- `postgres_lsp = {},` — it's opt-in per project regardless
+      -- (workspace_required: attaches only under a postgres-language-server.jsonc
+      -- root marker), but it's pre-1.0 and twice-renamed, so we're waiting.
     }
 
     -- Ensure the servers are installed (lua_ls ships as a prebuilt binary, so no

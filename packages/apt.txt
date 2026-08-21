@@ -17,6 +17,9 @@ curl
 unzip
 # bzip2: unpack go-sqlcmd's release tarball (see install_sqlcmd())
 bzip2
+# python3-venv: mason installs pip-based tools (sqlfluff) into a venv; Ubuntu
+# doesn't ship the venv module with python3 (Rocky/macOS need nothing extra)
+python3-venv
 # gcc + make: compile nvim-treesitter parsers and telescope-fzf-native
 gcc
 make

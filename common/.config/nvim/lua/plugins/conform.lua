@@ -21,7 +21,7 @@ return {
     -- Ensure the formatter binaries are installed (prettier supports range
     -- formatting, which the airtight save below relies on).
     require("mason-tool-installer").setup({
-      ensure_installed = { "prettier", "stylua" },
+      ensure_installed = { "prettier", "stylua", "sqlfluff" },
     })
 
     local conform = require("conform")
@@ -43,6 +43,7 @@ return {
         yaml = { "prettier" },
         markdown = { "prettier" },
         graphql = { "prettier" },
+        sql = { "sqlfluff" },
       },
 
       -- Prefer the project's own prettier (node_modules) so on-save formatting is
@@ -56,6 +57,23 @@ return {
               { path = ctx.dirname, upward = true }
             )[1]
             return local_bin or "prettier"
+          end,
+        },
+
+        -- sqlfluff needs a dialect (tsql / postgres / sqlite / …). Use the
+        -- project's .sqlfluff when one exists — run from its directory so
+        -- stdin-mode config discovery finds it, and do NOT pass --dialect
+        -- (the CLI flag would override the file). Otherwise fall back to
+        -- plain ANSI so formatting still works on stray SQL files.
+        sqlfluff = {
+          args = function(_, ctx)
+            local cfg = vim.fs.find(".sqlfluff", { path = ctx.dirname, upward = true })[1]
+            if cfg then return { "format", "-" } end
+            return { "format", "--dialect=ansi", "-" }
+          end,
+          cwd = function(_, ctx)
+            local cfg = vim.fs.find(".sqlfluff", { path = ctx.dirname, upward = true })[1]
+            return cfg and vim.fs.dirname(cfg) or ctx.dirname
           end,
         },
       },
